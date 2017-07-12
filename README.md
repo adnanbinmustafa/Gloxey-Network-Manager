@@ -6,7 +6,7 @@ This library aims to help developers in setting up [Volley](https://developer.an
 
         dependencies { 
 
-        compile 'io.gloxey.gnm:network-manager:1.0.0'
+        compile 'io.gloxey.gnm:network-manager:1.0.1'
 
         }
         
