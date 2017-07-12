@@ -1,0 +1,1 @@
+include ':app', ':gloxey-network-manager'
