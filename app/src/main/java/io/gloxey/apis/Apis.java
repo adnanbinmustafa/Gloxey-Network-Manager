@@ -16,17 +16,17 @@ public class Apis {
      * @param context
      * @param isDialog
      * @param view
-     * @param city
      * @param volleyResponse
      */
     public static void getWeatherRecord(Context context,
                                         boolean isDialog,
                                         View view,
-                                        String city,
                                         VolleyResponse volleyResponse) {
 
-        String requestURL = Constants.ApiLink.SERVER_BASE_URL + city + Constants.ApiLink.APP_ID;
+//        http:api.themoviedb.org/3/api_key=b207f08a06fee161e46c3a3af4c0f6db
+        
+        String requestURL = Constants.ApiLink.SERVER_BASE_URL + Constants.ApiLink.TOP_RATED + "api_key=" + Constants.ApiLink.APP_ID;
 
-        ConnectionManager.volleyRequest(context, isDialog, view, requestURL, volleyResponse);
+        ConnectionManager.volleyStringRequest(context, isDialog, view, requestURL, volleyResponse);
     }
 }

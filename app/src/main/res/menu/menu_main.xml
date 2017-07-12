@@ -8,11 +8,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_retro_request"
-        android:title="Retro Request"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/menu_volley_request_no_dialog"
         android:title="Volley Without Dialog"
         app:showAsAction="never" />

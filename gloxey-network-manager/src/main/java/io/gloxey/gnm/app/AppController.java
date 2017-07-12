@@ -11,6 +11,7 @@ import com.android.volley.toolbox.Volley;
 
 public class AppController {
 
+
     private static AppController mInstance;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
@@ -38,10 +39,9 @@ public class AppController {
     }
 
     public static synchronized AppController getInstance(Context context) {
+
         if (mInstance == null) {
             mInstance = new AppController(context);
-
-
         }
         return mInstance;
     }
@@ -62,4 +62,6 @@ public class AppController {
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }
+
+
 }

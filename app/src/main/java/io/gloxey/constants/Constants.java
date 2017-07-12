@@ -19,6 +19,7 @@ public class Constants {
          * Base URL
          */
         public static final String SERVER_BASE_URL = "http://api.themoviedb.org/3/";
+        public static final String TOP_RATED = "movie/top_rated?";
 
         /**
          * App ID

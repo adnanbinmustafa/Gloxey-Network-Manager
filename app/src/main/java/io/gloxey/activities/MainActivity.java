@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -21,15 +22,10 @@ import com.android.volley.VolleyError;
 
 import io.gloxey.R;
 import io.gloxey.apis.Apis;
-import io.gloxey.constants.Constants;
-import io.gloxey.gnm.interfaces.RetroResponse;
 import io.gloxey.gnm.interfaces.VolleyResponse;
-import io.gloxey.gnm.managers.ConnectionManager;
-import io.gloxey.interfaces.RetroApiInterface;
-import retrofit2.Call;
-import retrofit2.Response;
+import io.gloxey.gnm.managers.ConnectionDetector;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConnectionDetector.ConnectionReceiverListener {
 
     private TextView tvResult;
     private CoordinatorLayout parentLayout;
@@ -59,15 +55,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        ConnectionDetector.getInstance().setConnectionReceiverListener(this);
+        super.onResume();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
 
-            case R.id.menu_retro_request:
-                getWeatherRecordWithRetrofit();
-                break;
+
             case R.id.menu_volley_request:
                 tvResult.setText("");
                 isDialog = true;
@@ -95,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getWeatherRecordWithVolley() {
 
-        String city = "London,uk";
 
         if (isProgressBar) {
             progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar = null;
         }
 
-        Apis.getWeatherRecord(this, isDialog, progressBar, city, new VolleyResponse() {
+        Apis.getWeatherRecord(this, isDialog, progressBar, new VolleyResponse() {
             @Override
             public void onResponse(String _response) {
 
@@ -156,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                  * if internet is not connected then display
                  * SnackBar to handle retry
                  */
+
                 if (!connected) {
                     showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
                         @Override
@@ -168,46 +167,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    public void getWeatherRecordWithRetrofit() {
-
-
-        RetroApiInterface apiService = RetroApiInterface.ApiClient.getClient();
-
-        ConnectionManager.retroRequest(this, true, null, apiService.getTopRatedMovies(Constants.ApiLink.APP_ID), new RetroResponse() {
-            @Override
-            public <T> void onResponse(Call<T> _call, Response<T> _response) {
-
-                tvResult.setText(_response.toString());
-            }
-
-            @Override
-            public <T> void onFailure(Call<T> _call, Throwable _t) {
-                /**
-                 * handle retro errors
-                 */
-                showSnackBar(parentLayout, "Please try again later.");
-            }
-
-            @Override
-            public void isNetwork(boolean connected) {
-                /**
-                 * if internet is not connected then display
-                 * SnackBar to handle retry
-                 */
-                if (!connected) {
-                    showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getWeatherRecordWithVolley();
-                        }
-                    });
-                }
-            }
-        });
-
-
-    }
 
     public static void showSnackBar(View view, String message) {
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
@@ -218,4 +177,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void isNetwork(boolean isConnected) {
+
+        if (isConnected) {
+            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "disconnected", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
