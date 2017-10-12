@@ -38,6 +38,7 @@ public class ConnectionManager {
      * @param _url
      * @param _requestMethod
      * @param _params
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyStringRequest(final Context _context,
@@ -46,6 +47,7 @@ public class ConnectionManager {
                                            String _url,
                                            int _requestMethod,
                                            final HashMap<String, String> _params,
+                                           String _requestTag,
                                            final VolleyResponse _volleyResponse) {
 
 
@@ -100,7 +102,7 @@ public class ConnectionManager {
                     return _params;
                 }
             };
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -108,7 +110,6 @@ public class ConnectionManager {
             _volleyResponse.isNetwork(false);
         }
     }
-
 
     /**
      * Volley Post/put/delete request with header
@@ -120,6 +121,7 @@ public class ConnectionManager {
      * @param _requestMethod
      * @param _params
      * @param _headers
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyStringRequest(final Context _context,
@@ -129,6 +131,7 @@ public class ConnectionManager {
                                            int _requestMethod,
                                            final HashMap<String, String> _params,
                                            final HashMap<String, String> _headers,
+                                           String _requestTag,
                                            final VolleyResponse _volleyResponse) {
 
         /**
@@ -189,7 +192,7 @@ public class ConnectionManager {
                     return _params;
                 }
             };
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -206,12 +209,14 @@ public class ConnectionManager {
      * @param _isDialog
      * @param _view
      * @param _url
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyStringRequest(final Context _context,
                                            boolean _isDialog,
                                            final View _view,
                                            String _url,
+                                           String _requestTag,
                                            final VolleyResponse _volleyResponse) {
 
         /**
@@ -262,7 +267,7 @@ public class ConnectionManager {
 
                 }
             });
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
 
         } else {
 
@@ -282,6 +287,7 @@ public class ConnectionManager {
      * @param _view
      * @param _url
      * @param _headers
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyStringRequest(final Context _context,
@@ -289,6 +295,7 @@ public class ConnectionManager {
                                            final View _view,
                                            String _url,
                                            final HashMap<String, String> _headers,
+                                           String _requestTag,
                                            final VolleyResponse _volleyResponse) {
 
         /**
@@ -345,7 +352,7 @@ public class ConnectionManager {
                 }
 
             };
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -367,9 +374,9 @@ public class ConnectionManager {
      * @param _requestMethod
      * @param _jsonParamObject
      * @param _headers
+     * @param _requestTag
      * @param _volleyResponse
      */
-
     public static void volleyJSONRequest(final Context _context,
                                          final boolean _isDialog,
                                          final View _view,
@@ -377,6 +384,7 @@ public class ConnectionManager {
                                          int _requestMethod,
                                          JSONObject _jsonParamObject,
                                          final HashMap<String, String> _headers,
+                                         String _requestTag,
                                          final VolleyResponse _volleyResponse) {
 
 
@@ -404,9 +412,6 @@ public class ConnectionManager {
             JsonObjectRequest serverRequest = new JsonObjectRequest(_requestMethod, _url, _jsonParamObject, new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    // I have converted this to String, becasue i don't want to change my other stuff :D
-                    //again i'll convert back into json object for normal flow ;)
-                    // Bear with me :D :p
 
                     /**
                      * Hide loader
@@ -415,7 +420,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response.toString());
+                    _volleyResponse.onResponse(response);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -440,7 +445,7 @@ public class ConnectionManager {
 
 
             };
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -460,6 +465,7 @@ public class ConnectionManager {
      * @param _url
      * @param _requestMethod
      * @param _jsonParamObject
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyJSONRequest(final Context _context,
@@ -468,6 +474,7 @@ public class ConnectionManager {
                                          String _url,
                                          int _requestMethod,
                                          JSONObject _jsonParamObject,
+                                         String _requestTag,
                                          final VolleyResponse _volleyResponse) {
 
 
@@ -495,10 +502,6 @@ public class ConnectionManager {
             JsonObjectRequest serverRequest = new JsonObjectRequest(_requestMethod, _url, _jsonParamObject, new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    // I have converted this to String, becasue i don't want to change my other stuff :D
-                    // I am converting JSONObject into string and then again i'll convert back into json object for normal flow ;)
-                    // Bear with me :D :p
-
                     /**
                      * Hide loader
                      */
@@ -506,7 +509,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response.toString());
+                    _volleyResponse.onResponse(response);
 
                 }
 
@@ -525,7 +528,7 @@ public class ConnectionManager {
 
                 }
             });
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -543,12 +546,14 @@ public class ConnectionManager {
      * @param _isDialog
      * @param _view
      * @param _url
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyJSONRequest(final Context _context,
                                          boolean _isDialog,
                                          final View _view,
                                          String _url,
+                                         String _requestTag,
                                          final VolleyResponse _volleyResponse) {
 
 
@@ -576,10 +581,6 @@ public class ConnectionManager {
             JsonObjectRequest serverRequest = new JsonObjectRequest(Request.Method.GET, _url, null, new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    // I have converted this to String, becasue i don't want to change my other stuff :D
-                    // I am converting JSONObject into string and then again i'll convert back into json object for normal flow ;)
-                    // Bear with me :D :p
-
                     /**
                      * Hide loader
                      */
@@ -587,7 +588,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response.toString());
+                    _volleyResponse.onResponse(response);
 
                 }
 
@@ -606,7 +607,7 @@ public class ConnectionManager {
 
                 }
             });
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
@@ -625,6 +626,7 @@ public class ConnectionManager {
      * @param _view
      * @param _url
      * @param _headers
+     * @param _requestTag
      * @param _volleyResponse
      */
     public static void volleyJSONRequest(final Context _context,
@@ -632,6 +634,7 @@ public class ConnectionManager {
                                          final View _view,
                                          String _url,
                                          final HashMap<String, String> _headers,
+                                         String _requestTag,
                                          final VolleyResponse _volleyResponse) {
 
 
@@ -659,9 +662,6 @@ public class ConnectionManager {
             JsonObjectRequest serverRequest = new JsonObjectRequest(_url, null, new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    // I have converted this to String, becasue i don't want to change my other stuff :D
-                    //again i'll convert back into json object for normal flow ;)
-                    // Bear with me :D :p
 
                     /**
                      * Hide loader
@@ -670,7 +670,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response.toString());
+                    _volleyResponse.onResponse(response);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -695,13 +695,18 @@ public class ConnectionManager {
 
 
             };
-            AppController.getInstance(_context).addToRequestQueue(serverRequest);
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
         } else {
             /**
              * Set network false in callback
              */
             _volleyResponse.isNetwork(false);
         }
+    }
+
+
+    public static void cancelVolleyRequest(Context _context, String _requestTag) {
+        AppController.getInstance(_context).cancelPendingRequests(_requestTag);
     }
 
 
@@ -873,7 +878,7 @@ public class ConnectionManager {
     private static void hideLoader(View _view) {
 
         if (_view == null) {
-            if (dialog != null) {
+            if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
             }
         } else {

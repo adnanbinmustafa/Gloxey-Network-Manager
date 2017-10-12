@@ -20,6 +20,8 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 
+import org.json.JSONObject;
+
 import io.gloxey.R;
 import io.gloxey.apis.Apis;
 import io.gloxey.gnm.interfaces.VolleyResponse;
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
                     e.printStackTrace();
                 }
             }
+
 
             @Override
             public void onErrorResponse(VolleyError error) {

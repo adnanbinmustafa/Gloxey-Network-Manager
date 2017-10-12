@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -11,6 +12,10 @@ import com.android.volley.toolbox.Volley;
 
 public class AppController {
 
+    /**
+     * Log or request TAG
+     */
+    public static final String TAG = "GloxeyNetworkManager";
 
     private static AppController mInstance;
     private RequestQueue mRequestQueue;
@@ -55,9 +60,29 @@ public class AppController {
         return mRequestQueue;
     }
 
-    public <T> void addToRequestQueue(Request<T> req) {
+
+    public <T> void addToRequestQueue(Request<T> req, String _tag) {
+        // set the default tag if tag is empty
+
+        if (_tag != null && !_tag.equalsIgnoreCase(""))
+            req.setTag(_tag);
+        else
+            req.setTag(TAG);
+
         getRequestQueue().add(req);
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
+
+
+    public void cancelPendingRequests(Object tag) {
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(tag);
+        }
+    }
+
 
     public ImageLoader getImageLoader() {
         return mImageLoader;
