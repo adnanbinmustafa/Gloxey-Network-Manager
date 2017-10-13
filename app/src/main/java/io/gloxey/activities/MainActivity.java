@@ -12,19 +12,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
-
-import org.json.JSONObject;
 
 import io.gloxey.R;
 import io.gloxey.apis.Apis;
-import io.gloxey.gnm.interfaces.VolleyResponse;
+import io.gloxey.gnm.interfaces.VolleyCallback;
 import io.gloxey.gnm.managers.ConnectionDetector;
 
 public class MainActivity extends AppCompatActivity implements ConnectionDetector.ConnectionReceiverListener {
@@ -103,62 +95,19 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
             progressBar = null;
         }
 
-        Apis.getWeatherRecord(this, isDialog, progressBar, new VolleyResponse() {
+        Apis.getWeatherRecord(this, isDialog, progressBar, new VolleyCallback.StringResponse() {
             @Override
-            public void onResponse(String _response) {
+            public void onResponse(String _response, String _tag) {
 
-                /**
-                 * Handle response
-                 */
-                try {
-                    /**
-                     * Bonus ;)
-                     */
-//                    WeatherResponse weatherResponse = GloxeyJsonParser.getInstance().parse(_response, WeatherResponse.class);
+                tvResult.setText("" + _response);
 
-                    tvResult.setText("" + _response);
-
-                    showSnackBar(parentLayout, "Network call finished.");
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                /**
-                 * Error handling
-                 */
-                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-
-                    showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getWeatherRecordWithVolley();
-                        }
-                    });
-
-                } else if (error instanceof AuthFailureError) {
-                } else if (error instanceof ServerError) {
-                } else if (error instanceof NetworkError) {
-                } else if (error instanceof ParseError) {
-                }
-
+                showSnackBar(parentLayout, "Network call finished.");
 
             }
 
             @Override
-            public void isNetwork(boolean connected) {
-
-                /**
-                 * if internet is not connected then display
-                 * SnackBar to handle retry
-                 */
-
-                if (!connected) {
+            public void isConnected(boolean _connected, String _tag) {
+                if (!_connected) {
                     showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -166,6 +115,39 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
                         }
                     });
                 }
+            }
+
+            @Override
+            public void onTimeoutError(VolleyError _error, boolean _timeOutError, String _tag) {
+
+                if (_timeOutError) {
+                    showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            getWeatherRecordWithVolley();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onNetworkError(VolleyError _error, boolean _onNetworkError, String _tag) {
+
+            }
+
+            @Override
+            public void onAuthFailureError(VolleyError _error, boolean _onAuthFailureError, String _tag) {
+
+            }
+
+            @Override
+            public void onParseError(VolleyError _error, boolean _onParseError, String _tag) {
+
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError _error, boolean _onErrorResponse, String _tag) {
+
             }
         });
     }

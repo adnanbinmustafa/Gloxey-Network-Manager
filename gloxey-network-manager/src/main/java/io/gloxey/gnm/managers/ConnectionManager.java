@@ -11,11 +11,18 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -24,10 +31,16 @@ import java.util.Map;
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 import io.gloxey.gnm.app.AppController;
-import io.gloxey.gnm.interfaces.VolleyResponse;
+import io.gloxey.gnm.interfaces.VolleyCallback;
 
 public class ConnectionManager {
 
+
+    /**
+     *==============================================================================================
+     * Volley String Request
+     *==============================================================================================
+     */
 
     /**
      * Volley Post/put/delete request without header
@@ -39,7 +52,7 @@ public class ConnectionManager {
      * @param _requestMethod
      * @param _params
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyStringResponse
      */
     public static void volleyStringRequest(final Context _context,
                                            boolean _isDialog,
@@ -47,8 +60,8 @@ public class ConnectionManager {
                                            String _url,
                                            int _requestMethod,
                                            final HashMap<String, String> _params,
-                                           String _requestTag,
-                                           final VolleyResponse _volleyResponse) {
+                                           final String _requestTag,
+                                           final VolleyCallback.StringResponse _volleyStringResponse) {
 
 
         /**
@@ -58,7 +71,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyStringResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -80,7 +93,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyStringResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -93,8 +106,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyStringResponse, _requestTag);
                 }
             }) {
                 @Override
@@ -107,7 +119,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyStringResponse.isConnected(false, _requestTag);
         }
     }
 
@@ -122,7 +134,7 @@ public class ConnectionManager {
      * @param _params
      * @param _headers
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyStringResponse
      */
     public static void volleyStringRequest(final Context _context,
                                            boolean _isDialog,
@@ -131,8 +143,8 @@ public class ConnectionManager {
                                            int _requestMethod,
                                            final HashMap<String, String> _params,
                                            final HashMap<String, String> _headers,
-                                           String _requestTag,
-                                           final VolleyResponse _volleyResponse) {
+                                           final String _requestTag,
+                                           final VolleyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -141,7 +153,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyStringResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -164,7 +176,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyStringResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -178,8 +190,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyStringResponse, _requestTag);
                 }
             }) {
                 @Override
@@ -197,7 +208,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyStringResponse.isConnected(false, _requestTag);
 
         }
     }
@@ -210,14 +221,14 @@ public class ConnectionManager {
      * @param _view
      * @param _url
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyStringResponse
      */
     public static void volleyStringRequest(final Context _context,
                                            boolean _isDialog,
                                            final View _view,
                                            String _url,
-                                           String _requestTag,
-                                           final VolleyResponse _volleyResponse) {
+                                           final String _requestTag,
+                                           final VolleyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -227,7 +238,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyStringResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -250,7 +261,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyStringResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -263,8 +274,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyStringResponse, _requestTag);
                 }
             });
             AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
@@ -274,7 +284,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyStringResponse.isConnected(false, _requestTag);
 
         }
     }
@@ -288,15 +298,15 @@ public class ConnectionManager {
      * @param _url
      * @param _headers
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyStringResponse
      */
     public static void volleyStringRequest(final Context _context,
                                            boolean _isDialog,
                                            final View _view,
                                            String _url,
                                            final HashMap<String, String> _headers,
-                                           String _requestTag,
-                                           final VolleyResponse _volleyResponse) {
+                                           final String _requestTag,
+                                           final VolleyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -305,7 +315,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyStringResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -328,7 +338,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyStringResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -342,8 +352,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyStringResponse, _requestTag);
                 }
             }) {
                 @Override
@@ -357,10 +366,17 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyStringResponse.isConnected(false, _requestTag);
 
         }
     }
+
+
+    /**
+     *==============================================================================================
+     * Volley JSON Object Request
+     *==============================================================================================
+     */
 
 
     /**
@@ -375,7 +391,7 @@ public class ConnectionManager {
      * @param _jsonParamObject
      * @param _headers
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyJSONResponse
      */
     public static void volleyJSONRequest(final Context _context,
                                          final boolean _isDialog,
@@ -384,8 +400,8 @@ public class ConnectionManager {
                                          int _requestMethod,
                                          JSONObject _jsonParamObject,
                                          final HashMap<String, String> _headers,
-                                         String _requestTag,
-                                         final VolleyResponse _volleyResponse) {
+                                         final String _requestTag,
+                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -396,7 +412,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyJSONResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -420,7 +436,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyJSONResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -434,8 +450,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyJSONResponse, _requestTag);
                 }
             }) {
                 @Override
@@ -450,7 +465,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyJSONResponse.isConnected(false, _requestTag);
         }
     }
 
@@ -466,7 +481,7 @@ public class ConnectionManager {
      * @param _requestMethod
      * @param _jsonParamObject
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyJSONResponse
      */
     public static void volleyJSONRequest(final Context _context,
                                          boolean _isDialog,
@@ -474,8 +489,8 @@ public class ConnectionManager {
                                          String _url,
                                          int _requestMethod,
                                          JSONObject _jsonParamObject,
-                                         String _requestTag,
-                                         final VolleyResponse _volleyResponse) {
+                                         final String _requestTag,
+                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -486,7 +501,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyJSONResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -509,7 +524,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyJSONResponse.onResponse(response, _requestTag);
 
                 }
 
@@ -524,8 +539,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyJSONResponse, _requestTag);
                 }
             });
             AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
@@ -533,7 +547,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyJSONResponse.isConnected(false, _requestTag);
         }
     }
 
@@ -547,14 +561,14 @@ public class ConnectionManager {
      * @param _view
      * @param _url
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyJSONResponse
      */
     public static void volleyJSONRequest(final Context _context,
                                          boolean _isDialog,
                                          final View _view,
                                          String _url,
-                                         String _requestTag,
-                                         final VolleyResponse _volleyResponse) {
+                                         final String _requestTag,
+                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -565,7 +579,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyJSONResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -588,7 +602,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyJSONResponse.onResponse(response, _requestTag);
 
                 }
 
@@ -603,8 +617,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyJSONResponse, _requestTag);
                 }
             });
             AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
@@ -612,7 +625,7 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyJSONResponse.isConnected(false, _requestTag);
         }
     }
 
@@ -627,15 +640,15 @@ public class ConnectionManager {
      * @param _url
      * @param _headers
      * @param _requestTag
-     * @param _volleyResponse
+     * @param _volleyJSONResponse
      */
     public static void volleyJSONRequest(final Context _context,
                                          final boolean _isDialog,
                                          final View _view,
                                          String _url,
                                          final HashMap<String, String> _headers,
-                                         String _requestTag,
-                                         final VolleyResponse _volleyResponse) {
+                                         final String _requestTag,
+                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -646,7 +659,7 @@ public class ConnectionManager {
             /**
              * Set network true in callback
              */
-            _volleyResponse.isNetwork(true);
+            _volleyJSONResponse.isConnected(true, _requestTag);
 
             /**
              * Check whether we have to show loader or not
@@ -670,7 +683,7 @@ public class ConnectionManager {
                     /**
                      * Set response in callback
                      */
-                    _volleyResponse.onResponse(response);
+                    _volleyJSONResponse.onResponse(response, _requestTag);
                 }
 
             }, new com.android.volley.Response.ErrorListener() {
@@ -684,8 +697,7 @@ public class ConnectionManager {
                     /**
                      * Set error in callback
                      */
-                    _volleyResponse.onErrorResponse(error);
-
+                    volleyErrorHandler(error, _volleyJSONResponse, _requestTag);
                 }
             }) {
                 @Override
@@ -700,30 +712,424 @@ public class ConnectionManager {
             /**
              * Set network false in callback
              */
-            _volleyResponse.isNetwork(false);
+            _volleyJSONResponse.isConnected(false, _requestTag);
         }
     }
 
 
-    public static void cancelVolleyRequest(Context _context, String _requestTag) {
-        AppController.getInstance(_context).cancelPendingRequests(_requestTag);
+    /**
+     * =============================================================================================
+     * JSON Array Request
+     * =============================================================================================
+     */
+
+
+    /**
+     * Volley Post/put/delete request without header
+     *
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _requestMethod
+     * @param _params
+     * @param _requestTag
+     * @param _volleyArrayResponse
+     */
+    public static void volleyJSONArrayRequest(final Context _context,
+                                              boolean _isDialog,
+                                              final View _view,
+                                              String _url,
+                                              int _requestMethod,
+                                              final JSONArray _params,
+                                              final String _requestTag,
+                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+            /**
+             * Set network true in callback
+             */
+            _volleyArrayResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+            JsonArrayRequest serverRequest = new JsonArrayRequest(_requestMethod, _url, _params, new com.android.volley.Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set response in callback
+                     */
+                    _volleyArrayResponse.onResponse(response, _requestTag);
+                }
+
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set error in callback
+                     */
+                    volleyErrorHandler(error, _volleyArrayResponse, _requestTag);
+                }
+            });
+
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
+        } else {
+            /**
+             * Set network false in callback
+             */
+            _volleyArrayResponse.isConnected(false, _requestTag);
+        }
+    }
+
+    /**
+     * Volley Post/put/delete request with header
+     *
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _requestMethod
+     * @param _params
+     * @param _headers
+     * @param _requestTag
+     * @param _volleyArrayResponse
+     */
+    public static void volleyJSONArrayRequest(final Context _context,
+                                              boolean _isDialog,
+                                              final View _view,
+                                              String _url,
+                                              int _requestMethod,
+                                              final JSONArray _params,
+                                              final HashMap<String, String> _headers,
+                                              final String _requestTag,
+                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+            /**
+             * Set network true in callback
+             */
+            _volleyArrayResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+            JsonArrayRequest serverRequest = new JsonArrayRequest(_requestMethod, _url, _params, new com.android.volley.Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set response in callback
+                     */
+                    _volleyArrayResponse.onResponse(response, _requestTag);
+                }
+
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set error in callback
+                     */
+                    volleyErrorHandler(error, _volleyArrayResponse, _requestTag);
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return _headers;
+                }
+            };
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
+        } else {
+            /**
+             * Set network false in callback
+             */
+            _volleyArrayResponse.isConnected(false, _requestTag);
+
+        }
+    }
+
+    /**
+     * Volley Get request without header
+     *
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _requestTag
+     * @param _volleyArrayResponse
+     */
+    public static void volleyJSONArrayRequest(final Context _context,
+                                              boolean _isDialog,
+                                              final View _view,
+                                              String _url,
+                                              final String _requestTag,
+                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+
+            /**
+             * Set network true in callback
+             */
+            _volleyArrayResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+            JsonArrayRequest serverRequest = new JsonArrayRequest(_url, new com.android.volley.Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set response in callback
+                     */
+                    _volleyArrayResponse.onResponse(response, _requestTag);
+                }
+
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set error in callback
+                     */
+                    volleyErrorHandler(error, _volleyArrayResponse, _requestTag);
+                }
+            });
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
+
+        } else {
+
+            /**
+             * Set network false in callback
+             */
+            _volleyArrayResponse.isConnected(false, _requestTag);
+
+        }
+    }
+
+    /**
+     * Volley Get request with header
+     *
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _headers
+     * @param _requestTag
+     * @param _volleyArrayResponse
+     */
+    public static void volleyStringRequest(final Context _context,
+                                           boolean _isDialog,
+                                           final View _view,
+                                           String _url,
+                                           final HashMap<String, String> _headers,
+                                           final String _requestTag,
+                                           final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+            /**
+             * Set network true in callback
+             */
+            _volleyArrayResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+            JsonArrayRequest serverRequest = new JsonArrayRequest(_url, new com.android.volley.Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set response in callback
+                     */
+                    _volleyArrayResponse.onResponse(response, _requestTag);
+                }
+
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    /**
+                     * Set error in callback
+                     */
+                    volleyErrorHandler(error, _volleyArrayResponse, _requestTag);
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return _headers;
+                }
+
+            };
+            AppController.getInstance(_context).addToRequestQueue(serverRequest, _requestTag);
+        } else {
+            /**
+             * Set network false in callback
+             */
+            _volleyArrayResponse.isConnected(false, _requestTag);
+
+        }
     }
 
 
     /**
-     * Volley Error Handler Helper
+     * Cancel Pending Request
      *
-     * @param context
-     * @param error
+     * @param _context
+     * @param _requestTag
      */
-//    private void volleyErrorHandler(Context context, VolleyError error) {
-//        if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-//        } else if (error instanceof AuthFailureError) {
-//        } else if (error instanceof ServerError) {
-//        } else if (error instanceof NetworkError) {
-//        } else if (error instanceof ParseError) {
-//        }
-//    }
+    public static void cancelPendingRequests(Context _context, String _requestTag) {
+        AppController.getInstance(_context).cancelPendingRequests(_requestTag);
+    }
+
+
+    /***
+     *
+     * @param _error
+     * @param _callback
+     * @param _tag
+     */
+    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.StringResponse _callback, String _tag) {
+
+        _callback.onErrorResponse(_error, true, _tag);
+
+        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
+            _callback.onTimeoutError(_error, true, _tag);
+
+        } else if (_error instanceof AuthFailureError) {
+            _callback.onAuthFailureError(_error, true, _tag);
+
+        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
+            _callback.onNetworkError(_error, true, _tag);
+
+        } else if (_error instanceof ParseError) {
+            _callback.onParseError(_error, true, _tag);
+        }
+
+    }
+
+    /**
+     * @param _error
+     * @param _callback
+     * @param _tag
+     */
+    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.ArrayResponse _callback, String _tag) {
+
+        _callback.onErrorResponse(_error, true, _tag);
+
+        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
+            _callback.onTimeoutError(_error, true, _tag);
+
+        } else if (_error instanceof AuthFailureError) {
+            _callback.onAuthFailureError(_error, true, _tag);
+
+        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
+            _callback.onNetworkError(_error, true, _tag);
+
+        } else if (_error instanceof ParseError) {
+            _callback.onParseError(_error, true, _tag);
+        }
+
+
+    }
+
+    /**
+     * @param _error
+     * @param _callback
+     * @param _tag
+     */
+    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.JSONResponse _callback, String _tag) {
+
+        _callback.onErrorResponse(_error, true, _tag);
+        
+        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
+            _callback.onTimeoutError(_error, true, _tag);
+
+        } else if (_error instanceof AuthFailureError) {
+            _callback.onAuthFailureError(_error, true, _tag);
+
+        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
+            _callback.onNetworkError(_error, true, _tag);
+
+        } else if (_error instanceof ParseError) {
+            _callback.onParseError(_error, true, _tag);
+        }
+
+    }
+
 
     /**
      * Check network connectivity
