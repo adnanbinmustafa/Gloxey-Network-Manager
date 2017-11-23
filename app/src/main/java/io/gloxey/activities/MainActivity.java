@@ -16,7 +16,7 @@ import com.android.volley.VolleyError;
 
 import io.gloxey.R;
 import io.gloxey.apis.Apis;
-import io.gloxey.gnm.interfaces.VolleyCallback;
+import io.gloxey.gnm.interfaces.GloxeyCallback;
 import io.gloxey.gnm.managers.ConnectionDetector;
 
 public class MainActivity extends AppCompatActivity implements ConnectionDetector.ConnectionReceiverListener {
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
             progressBar = null;
         }
 
-        Apis.getWeatherRecord(this, isDialog, progressBar, new VolleyCallback.StringResponse() {
+        Apis.getWeatherRecord(this, isDialog, progressBar, new GloxeyCallback.StringResponse() {
             @Override
             public void onResponse(String _response, String _tag) {
 
@@ -117,39 +117,15 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
                 }
             }
 
-            @Override
-            public void onTimeoutError(VolleyError _error, boolean _timeOutError, String _tag) {
-
-                if (_timeOutError) {
-                    showSnackBar(parentLayout, getString(R.string.internet_not_found), getString(R.string.retry), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getWeatherRecordWithVolley();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onNetworkError(VolleyError _error, boolean _onNetworkError, String _tag) {
-
-            }
-
-            @Override
-            public void onAuthFailureError(VolleyError _error, boolean _onAuthFailureError, String _tag) {
-
-            }
-
-            @Override
-            public void onParseError(VolleyError _error, boolean _onParseError, String _tag) {
-
-            }
 
             @Override
             public void onErrorResponse(VolleyError _error, boolean _onErrorResponse, String _tag) {
 
             }
+
         });
+
+        
     }
 
 

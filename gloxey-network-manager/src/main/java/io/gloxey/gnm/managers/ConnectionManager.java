@@ -11,16 +11,14 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +29,7 @@ import java.util.Map;
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 import io.gloxey.gnm.app.AppController;
-import io.gloxey.gnm.interfaces.VolleyCallback;
+import io.gloxey.gnm.interfaces.GloxeyCallback;
 
 public class ConnectionManager {
 
@@ -61,7 +59,7 @@ public class ConnectionManager {
                                            int _requestMethod,
                                            final HashMap<String, String> _params,
                                            final String _requestTag,
-                                           final VolleyCallback.StringResponse _volleyStringResponse) {
+                                           final GloxeyCallback.StringResponse _volleyStringResponse) {
 
 
         /**
@@ -144,7 +142,7 @@ public class ConnectionManager {
                                            final HashMap<String, String> _params,
                                            final HashMap<String, String> _headers,
                                            final String _requestTag,
-                                           final VolleyCallback.StringResponse _volleyStringResponse) {
+                                           final GloxeyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -228,7 +226,7 @@ public class ConnectionManager {
                                            final View _view,
                                            String _url,
                                            final String _requestTag,
-                                           final VolleyCallback.StringResponse _volleyStringResponse) {
+                                           final GloxeyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -306,7 +304,7 @@ public class ConnectionManager {
                                            String _url,
                                            final HashMap<String, String> _headers,
                                            final String _requestTag,
-                                           final VolleyCallback.StringResponse _volleyStringResponse) {
+                                           final GloxeyCallback.StringResponse _volleyStringResponse) {
 
         /**
          * Check network before api call
@@ -401,7 +399,7 @@ public class ConnectionManager {
                                          JSONObject _jsonParamObject,
                                          final HashMap<String, String> _headers,
                                          final String _requestTag,
-                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
+                                         final GloxeyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -490,7 +488,7 @@ public class ConnectionManager {
                                          int _requestMethod,
                                          JSONObject _jsonParamObject,
                                          final String _requestTag,
-                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
+                                         final GloxeyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -568,7 +566,7 @@ public class ConnectionManager {
                                          final View _view,
                                          String _url,
                                          final String _requestTag,
-                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
+                                         final GloxeyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -648,7 +646,7 @@ public class ConnectionManager {
                                          String _url,
                                          final HashMap<String, String> _headers,
                                          final String _requestTag,
-                                         final VolleyCallback.JSONResponse _volleyJSONResponse) {
+                                         final GloxeyCallback.JSONResponse _volleyJSONResponse) {
 
 
         /**
@@ -743,7 +741,7 @@ public class ConnectionManager {
                                               int _requestMethod,
                                               final JSONArray _params,
                                               final String _requestTag,
-                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+                                              final GloxeyCallback.ArrayResponse _volleyArrayResponse) {
 
 
         /**
@@ -822,7 +820,7 @@ public class ConnectionManager {
                                               final JSONArray _params,
                                               final HashMap<String, String> _headers,
                                               final String _requestTag,
-                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+                                              final GloxeyCallback.ArrayResponse _volleyArrayResponse) {
 
         /**
          * Check network before api call
@@ -901,7 +899,7 @@ public class ConnectionManager {
                                               final View _view,
                                               String _url,
                                               final String _requestTag,
-                                              final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+                                              final GloxeyCallback.ArrayResponse _volleyArrayResponse) {
 
         /**
          * Check network before api call
@@ -979,7 +977,7 @@ public class ConnectionManager {
                                            String _url,
                                            final HashMap<String, String> _headers,
                                            final String _requestTag,
-                                           final VolleyCallback.ArrayResponse _volleyArrayResponse) {
+                                           final GloxeyCallback.ArrayResponse _volleyArrayResponse) {
 
         /**
          * Check network before api call
@@ -1056,52 +1054,181 @@ public class ConnectionManager {
     }
 
 
+    /**
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _params
+     * @param _requestTag
+     * @param _loopJResponse
+     */
+    public static void uploadMultiPartFiles(Context _context,
+                                            boolean _isDialog,
+                                            final View _view,
+                                            String _url,
+                                            RequestParams _params,
+                                            final String _requestTag,
+                                            final GloxeyCallback.LoopJMultiPartFileUpload _loopJResponse) {
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+            /**
+             * Set network true in callback
+             */
+            _loopJResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setTimeout(60000);
+
+            client.post(_context, _url, _params, new AsyncHttpResponseHandler() {
+                @Override
+                public void onStart() {
+                }
+
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+
+                    _loopJResponse.onSuccess(statusCode, headers, bytes);
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable error) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    _loopJResponse.onFailure(statusCode, headers, bytes, error);
+                }
+
+            });
+
+
+        } else {
+            /**
+             * Set network false in callback
+             */
+            _loopJResponse.isConnected(false, _requestTag);
+        }
+
+
+    }
+
+
+    /**
+     * Set both the connection and socket timeouts. By default, both are set to
+     * 60seconds.
+     *
+     * @param _context
+     * @param _isDialog
+     * @param _view
+     * @param _url
+     * @param _params
+     * @param _requestTag
+     * @param _timeOut
+     * @param _loopJResponse
+     */
+    public static void uploadMultiPartFiles(Context _context,
+                                            boolean _isDialog,
+                                            final View _view,
+                                            String _url,
+                                            RequestParams _params,
+                                            final String _requestTag,
+                                            final int _timeOut,
+                                            final GloxeyCallback.LoopJMultiPartFileUpload _loopJResponse) {
+
+        /**
+         * Check network before api call
+         */
+        if (isNetwork(_context)) {
+            /**
+             * Set network true in callback
+             */
+            _loopJResponse.isConnected(true, _requestTag);
+
+            /**
+             * Check whether we have to show loader or not
+             */
+            if (_isDialog) {
+                showLoader(_context, _view);
+            }
+
+            /**
+             * Handle network call
+             */
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setTimeout(_timeOut);
+
+            client.post(_context, _url, _params, new AsyncHttpResponseHandler() {
+                @Override
+                public void onStart() {
+                }
+
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+
+                    _loopJResponse.onSuccess(statusCode, headers, bytes);
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable error) {
+
+                    /**
+                     * Hide loader
+                     */
+                    hideLoader(_view);
+                    _loopJResponse.onFailure(statusCode, headers, bytes, error);
+                }
+
+            });
+
+
+        } else {
+            /**
+             * Set network false in callback
+             */
+            _loopJResponse.isConnected(false, _requestTag);
+        }
+
+
+    }
+
     /***
      *
      * @param _error
      * @param _callback
      * @param _tag
      */
-    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.StringResponse _callback, String _tag) {
+    private static void volleyErrorHandler(VolleyError _error, GloxeyCallback.StringResponse _callback, String _tag) {
 
         _callback.onErrorResponse(_error, true, _tag);
-
-        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
-            _callback.onTimeoutError(_error, true, _tag);
-
-        } else if (_error instanceof AuthFailureError) {
-            _callback.onAuthFailureError(_error, true, _tag);
-
-        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
-            _callback.onNetworkError(_error, true, _tag);
-
-        } else if (_error instanceof ParseError) {
-            _callback.onParseError(_error, true, _tag);
-        }
-
-    }
-
-    /**
-     * @param _error
-     * @param _callback
-     * @param _tag
-     */
-    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.ArrayResponse _callback, String _tag) {
-
-        _callback.onErrorResponse(_error, true, _tag);
-
-        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
-            _callback.onTimeoutError(_error, true, _tag);
-
-        } else if (_error instanceof AuthFailureError) {
-            _callback.onAuthFailureError(_error, true, _tag);
-
-        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
-            _callback.onNetworkError(_error, true, _tag);
-
-        } else if (_error instanceof ParseError) {
-            _callback.onParseError(_error, true, _tag);
-        }
 
 
     }
@@ -1111,23 +1238,21 @@ public class ConnectionManager {
      * @param _callback
      * @param _tag
      */
-    private static void volleyErrorHandler(VolleyError _error, VolleyCallback.JSONResponse _callback, String _tag) {
+    private static void volleyErrorHandler(VolleyError _error, GloxeyCallback.ArrayResponse _callback, String _tag) {
 
         _callback.onErrorResponse(_error, true, _tag);
-        
-        if (_error instanceof TimeoutError || _error instanceof NoConnectionError) {
-            _callback.onTimeoutError(_error, true, _tag);
 
-        } else if (_error instanceof AuthFailureError) {
-            _callback.onAuthFailureError(_error, true, _tag);
 
-        } else if (_error instanceof ServerError || _error instanceof NetworkError) {
-            _callback.onNetworkError(_error, true, _tag);
+    }
 
-        } else if (_error instanceof ParseError) {
-            _callback.onParseError(_error, true, _tag);
-        }
+    /**
+     * @param _error
+     * @param _callback
+     * @param _tag
+     */
+    private static void volleyErrorHandler(VolleyError _error, GloxeyCallback.JSONResponse _callback, String _tag) {
 
+        _callback.onErrorResponse(_error, true, _tag);
     }
 
 

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import io.gloxey.constants.Constants;
-import io.gloxey.gnm.interfaces.VolleyCallback;
+import io.gloxey.gnm.interfaces.GloxeyCallback;
 import io.gloxey.gnm.managers.ConnectionManager;
 
 public class Apis {
@@ -21,7 +21,7 @@ public class Apis {
     public static void getWeatherRecord(Context context,
                                         boolean isDialog,
                                         View view,
-                                        VolleyCallback.StringResponse volleyStringResponse) {
+                                        GloxeyCallback.StringResponse volleyStringResponse) {
 
 //        http:api.themoviedb.org/3/api_key=b207f08a06fee161e46c3a3af4c0f6db
 
