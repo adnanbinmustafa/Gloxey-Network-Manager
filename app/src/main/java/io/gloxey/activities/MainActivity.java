@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
             progressBar = null;
         }
 
+
         Apis.getWeatherRecord(this, isDialog, progressBar, new GloxeyCallback.StringResponse() {
             @Override
             public void onResponse(String _response, String _tag) {
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionDetecto
 
         });
 
-        
+
     }
 
 
