@@ -2,13 +2,46 @@
 
 This library aims to help developers in setting up [Volley](https://developer.android.com/training/volley/index.html) for rest api calls. It also provides different usefull methods about network connectivity to save development time.
 
-#### Gradle Dependency
+## Gradle Setup
+
+#### Step 1: Add the JitPack repository to your build file
 
         dependencies { 
 
-        compile 'io.gloxey.gnm:network-manager:1.0.1'
+        	        implementation 'com.github.adnanbinmustafa:Gloxey-Network-Manager:v1.0.2'
 
         }
+
+#### Step 2: Add the dependency
+ 
+          allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+        
+        
+## Maven Setup
+
+#### Step 1: Add the JitPack repository to your build file
+
+       <repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+        
+#### Step 1: Add the dependency
+
+       <dependency>
+	    <groupId>com.github.adnanbinmustafa</groupId>
+	    <artifactId>Gloxey-Network-Manager</artifactId>
+	    <version>Tag</version>
+	</dependency>
+        
+        
         
         
 ### ConnectionManager.class
