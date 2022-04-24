@@ -5,7 +5,6 @@ import com.google.gson.JsonSyntaxException;
 
 public class GloxeyJsonParser {
 
-
     private static GloxeyJsonParser mInstance;
     private static final String ERROR_MESSAGE = "Invalid JSON Exception, Parsing Error";
 

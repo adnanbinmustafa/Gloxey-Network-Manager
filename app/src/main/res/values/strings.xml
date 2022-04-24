@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Sample</string>
-
+    <string name="app_name">GloxeyNetworkManagerExample</string>
+    
 
     <string name="retry">Retry</string>
     <string name="internet_not_found">Internet not found</string>

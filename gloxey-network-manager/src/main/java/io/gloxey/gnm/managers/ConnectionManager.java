@@ -2,13 +2,13 @@ package io.gloxey.gnm.managers;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.view.View;
+
+import androidx.annotation.NonNull;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -26,9 +26,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import cc.cloudist.acplibrary.ACProgressConstant;
-import cc.cloudist.acplibrary.ACProgressFlower;
 import io.gloxey.gnm.app.AppController;
+import io.gloxey.gnm.dialog.CustomProgressDialog;
 import io.gloxey.gnm.interfaces.GloxeyCallback;
 
 public class ConnectionManager {
@@ -1380,9 +1379,10 @@ public class ConnectionManager {
             }
         }
         return false;
+
     }
 
-    private static ACProgressFlower dialog = null;
+    private static CustomProgressDialog dialog = null;
 
     /**
      * Show progress
@@ -1392,10 +1392,7 @@ public class ConnectionManager {
     private static void showLoader(Context _context, View _view) {
 
         if (_view == null) {
-            dialog = new ACProgressFlower.Builder(_context)
-                    .direction(ACProgressConstant.DIRECT_CLOCKWISE)
-                    .themeColor(Color.WHITE)
-                    .fadeColor(Color.DKGRAY).build();
+            dialog = new CustomProgressDialog(_context);
             dialog.show();
         } else {
             _view.setVisibility(View.VISIBLE);
@@ -1410,7 +1407,7 @@ public class ConnectionManager {
 
         if (_view == null) {
             if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
+                dialog.cancel();
             }
         } else {
             _view.setVisibility(View.GONE);
@@ -1420,4 +1417,3 @@ public class ConnectionManager {
 
 
 }
-
