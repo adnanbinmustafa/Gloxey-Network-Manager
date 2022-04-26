@@ -1263,33 +1263,38 @@ public class ConnectionManager {
      */
     public static boolean isNetwork(@NonNull Context context) {
 
+//        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            Network[] networks = connectivityManager.getAllNetworks();
+//            NetworkInfo networkInfo;
+//            for (Network mNetwork : networks) {
+//                networkInfo = connectivityManager.getNetworkInfo(mNetwork);
+//                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
+//                    return true;
+//                }
+//            }
+//        } else {
+//            if (connectivityManager != null) {
+//                //noinspection deprecation
+//                NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
+//                if (info != null) {
+//                    for (NetworkInfo anInfo : info) {
+//                        if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
+//
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return false;
+
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Network[] networks = connectivityManager.getAllNetworks();
-            NetworkInfo networkInfo;
-            for (Network mNetwork : networks) {
-                networkInfo = connectivityManager.getNetworkInfo(mNetwork);
-                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
-                    return true;
-                }
-            }
-        } else {
-            if (connectivityManager != null) {
-                //noinspection deprecation
-                NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
-                if (info != null) {
-                    for (NetworkInfo anInfo : info) {
-                        if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
-
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-
+        //should check null because in airplane mode it will be null
+        return netInfo != null && netInfo.isAvailable() && netInfo.isConnected();
     }
 
 
