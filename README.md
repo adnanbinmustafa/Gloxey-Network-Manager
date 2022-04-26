@@ -8,7 +8,7 @@ This library aims to help developers in setting up [Volley](https://developer.an
 
         dependencies { 
 
-        	        implementation 'com.github.adnanbinmustafa:Gloxey-Network-Manager:v1.0.2'
+        	        implementation 'com.github.adnanbinmustafa:Gloxey-Network-Manager:Tag'
 
         }
 
